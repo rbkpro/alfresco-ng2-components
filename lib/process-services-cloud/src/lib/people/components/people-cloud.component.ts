@@ -191,6 +191,7 @@ export class PeopleCloudComponent implements OnInit, OnChanges, OnDestroy {
             }),
             tap((value) => {
                 this.searchedValue = value;
+                this.setFormInvalidIfPreselectedUsersNotChanged();
                 if (value) {
                     this.setTypingError();
                 }
@@ -384,6 +385,7 @@ export class PeopleCloudComponent implements OnInit, OnChanges, OnDestroy {
 
         this.changedUsers.emit(this.selectedUsers);
         this.resetSearchUsers();
+        this.setFormInvalidIfPreselectedUsersNotChanged();
     }
 
     onRemove(userToRemove: IdentityUserModel) {
@@ -396,6 +398,40 @@ export class PeopleCloudComponent implements OnInit, OnChanges, OnDestroy {
             this.removeUserFromValidation(userToRemove);
             this.checkPreselectValidationErrors();
         }
+        this.setFormInvalidIfPreselectedUsersNotChanged();
+    }
+
+    setFormInvalidIfPreselectedUsersNotChanged() {
+        if (this.hasPreSelectUsers() && (this.selectedUsers.length === this.preSelectUsers.length)) {
+            if (this.isSingleMode()) {
+                if (this.preSelectUsers[0].username === this.selectedUsers[0].username) {
+                    this.searchUserCtrl.setErrors({ noChanges: 'true'});
+                } else {
+                    this.markSearchUserControlAsDirty();
+                }
+            } else {
+                if (this.compareSelectedUsersWithPreselectedUsers()) {
+                    this.searchUserCtrl.setErrors({ noChanges: 'true'});
+                } else {
+                    this.markSearchUserControlAsDirty();
+                }
+            }
+        } else {
+            this.markSearchUserControlAsDirty();
+        }
+    }
+
+    markSearchUserControlAsDirty() {
+        this.searchUserCtrl.reset();
+        this.searchUserCtrl.markAsDirty();
+    }
+
+    private compareSelectedUsersWithPreselectedUsers() {
+        return this.preSelectUsers.every((preSelectedUse) => !!this.selectedUsers.find(selectedUser => this.isUsersEqual(selectedUser, preSelectedUse)));
+    }
+
+    private isUsersEqual(selectedUser, preSelectedUser) {
+        return selectedUser.username === preSelectedUser.username;
     }
 
     private removeUserFromSelected(userToRemove: IdentityUserModel) {

@@ -191,6 +191,7 @@ export class GroupCloudComponent implements OnInit, OnChanges, OnDestroy {
             }),
             tap((value) => {
                 this.searchedValue = value;
+                this.setFormInvalidIfPreselectedGroupsNotChanged();
                 if (value) {
                     this.setTypingError();
                 }
@@ -342,6 +343,7 @@ export class GroupCloudComponent implements OnInit, OnChanges, OnDestroy {
 
         this.changedGroups.emit(this.selectedGroups);
         this.resetSearchGroups();
+        this.setFormInvalidIfPreselectedGroupsNotChanged();
     }
 
     onRemove(groupToRemove: IdentityGroupModel) {
@@ -354,6 +356,40 @@ export class GroupCloudComponent implements OnInit, OnChanges, OnDestroy {
             this.removeGroupFromValidation(groupToRemove);
             this.checkPreselectValidationErrors();
         }
+        this.setFormInvalidIfPreselectedGroupsNotChanged();
+    }
+
+    setFormInvalidIfPreselectedGroupsNotChanged() {
+        if (this.hasPreSelectGroups() && (this.selectedGroups.length === this.preSelectGroups.length)) {
+            if (this.isSingleMode()) {
+                if (this.preSelectGroups[0].name === this.selectedGroups[0].name) {
+                    this.searchGroupsControl.setErrors({ noChanges: 'true'});
+                } else {
+                    this.markSearchGroupsControlAsDirty();
+                }
+            } else {
+                if (this.compareSelectedGroupsWithPreselectedGroups()) {
+                    this.searchGroupsControl.setErrors({ noChanges: 'true'});
+                } else {
+                    this.markSearchGroupsControlAsDirty();
+                }
+            }
+        } else {
+            this.markSearchGroupsControlAsDirty();
+        }
+    }
+
+    markSearchGroupsControlAsDirty() {
+        this.searchGroupsControl.reset();
+        this.searchGroupsControl.markAsDirty();
+    }
+
+    private compareSelectedGroupsWithPreselectedGroups() {
+        return this.preSelectGroups.every((preSelectGroup) => !!this.selectedGroups.find(selectedGroup => this.isGroupsEqual(selectedGroup, preSelectGroup)));
+    }
+
+    isGroupsEqual(selectedUser, preSelectedUser) {
+        return selectedUser.username === preSelectedUser.username;
     }
 
     private removeGroupFromSelected(groupToRemove: IdentityGroupModel) {
