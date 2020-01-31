@@ -191,7 +191,7 @@ export class PeopleCloudComponent implements OnInit, OnChanges, OnDestroy {
             }),
             tap((value) => {
                 this.searchedValue = value;
-                this.setFormInvalidIfPreselectedUsersNotChanged();
+                this.validateSearchUsersController();
                 if (value) {
                     this.setTypingError();
                 }
@@ -385,7 +385,7 @@ export class PeopleCloudComponent implements OnInit, OnChanges, OnDestroy {
 
         this.changedUsers.emit(this.selectedUsers);
         this.resetSearchUsers();
-        this.setFormInvalidIfPreselectedUsersNotChanged();
+        this.validateSearchUsersController();
     }
 
     onRemove(userToRemove: IdentityUserModel) {
@@ -398,10 +398,10 @@ export class PeopleCloudComponent implements OnInit, OnChanges, OnDestroy {
             this.removeUserFromValidation(userToRemove);
             this.checkPreselectValidationErrors();
         }
-        this.setFormInvalidIfPreselectedUsersNotChanged();
+        this.validateSearchUsersController();
     }
 
-    setFormInvalidIfPreselectedUsersNotChanged() {
+    validateSearchUsersController() {
         if (this.hasPreSelectUsers() && (this.selectedUsers.length === this.preSelectUsers.length)) {
             if (this.isSingleMode()) {
                 if (this.preSelectUsers[0].username === this.selectedUsers[0].username) {
@@ -410,7 +410,7 @@ export class PeopleCloudComponent implements OnInit, OnChanges, OnDestroy {
                     this.markSearchUserControlAsDirty();
                 }
             } else {
-                if (this.compareSelectedUsersWithPreselectedUsers()) {
+                if (this.isSelectedAndPreselectedUsersIdentical()) {
                     this.searchUserCtrl.setErrors({ noChanges: 'true'});
                 } else {
                     this.markSearchUserControlAsDirty();
@@ -426,8 +426,8 @@ export class PeopleCloudComponent implements OnInit, OnChanges, OnDestroy {
         this.searchUserCtrl.markAsDirty();
     }
 
-    private compareSelectedUsersWithPreselectedUsers() {
-        return this.preSelectUsers.every((preSelectedUse) => !!this.selectedUsers.find(selectedUser => this.isUsersEqual(selectedUser, preSelectedUse)));
+    private isSelectedAndPreselectedUsersIdentical() {
+        return this.preSelectUsers.every((preSelectedUser) => !!this.selectedUsers.find(selectedUser => this.isUsersEqual(selectedUser, preSelectedUser)));
     }
 
     private isUsersEqual(selectedUser, preSelectedUser) {
