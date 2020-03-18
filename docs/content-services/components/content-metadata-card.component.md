@@ -210,6 +210,40 @@ A more complex config is shown in the example below:
   }
 ```
 
+#### Custom property title example
+
+Metadata property title can override from ADF. 
+
+```json
+  { 
+    "name": "exif:pixelYDimension", // your desired property
+    "title": "Custom YDimension Name" // you desired title
+  }
+```
+
+```json
+  "content-metadata": {
+    "presets": {
+      "kittens": [
+      {
+        "title": "GROUP-TITLE1-TRANSLATION-KEY",
+        "items": [
+          {
+            "aspect": "exif:exif",
+            "properties": [
+              "exif:pixelXDimension",
+              {
+                "title": "Custom YDimension Name",
+                "name": "exif:pixelYDimension"
+              }
+            ]
+          }
+    ]
+  }
+```
+
+![custom-ptoperty-title](../../docassets/images/content-meta-data-custom-ptoperty-title.png)
+
 The result of this config would be two accordion groups with the following properties:
 
 | GROUP-TITLE1-TRANSLATION-KEY |
