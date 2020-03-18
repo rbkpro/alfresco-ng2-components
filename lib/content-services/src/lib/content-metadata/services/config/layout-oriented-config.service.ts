@@ -21,7 +21,7 @@ import {
     OrganisedPropertyGroup,
     PropertyGroupContainer
 } from '../../interfaces/content-metadata.interfaces';
-import { getProperty } from './property-group-reader';
+import { getProperty, setPropertyTitle } from './property-group-reader';
 
 export class LayoutOrientedConfigService implements ContentMetadataConfig {
 
@@ -40,7 +40,10 @@ export class LayoutOrientedConfigService implements ContentMetadataConfig {
         const organisedPropertyGroup = layoutBlocks.map((layoutBlock) => {
             const flattenedItems = this.flattenItems(layoutBlock.items),
                 properties = flattenedItems.reduce((props, explodedItem) => {
-                    const property = getProperty(propertyGroups, explodedItem.groupName, explodedItem.propertyName) || [];
+                    const isProperty = typeof explodedItem.property  === 'object';
+                    const propertyName = isProperty ? explodedItem.property.name : explodedItem.property;
+                    let  property = getProperty(propertyGroups, explodedItem.groupName, propertyName) || [];
+                    if (isProperty) { property = setPropertyTitle(property, explodedItem.property); }
                     return props.concat(property);
                 }, []);
 
@@ -92,10 +95,10 @@ export class LayoutOrientedConfigService implements ContentMetadataConfig {
     private flattenItems(items) {
         return items.reduce((accumulator, item) => {
             const properties = Array.isArray(item.properties) ? item.properties : [item.properties];
-            const flattenedProperties = properties.map((propertyName) => {
+            const flattenedProperties = properties.map((property) => {
                 return {
                     groupName: item.aspect || item.type,
-                    propertyName
+                    property
                 };
             });
 

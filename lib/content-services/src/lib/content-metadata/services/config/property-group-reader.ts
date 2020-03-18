@@ -41,3 +41,15 @@ export function getProperty(propertyGroups: PropertyGroupContainer, groupName: s
 
     return propertyDefinitions;
 }
+
+export function setPropertyTitle(item: Property | Property[], property: Property): Property | Property[] {
+    let properties;
+    if (item instanceof Array) {
+        properties =  [ ...item ];
+        const filteredProperty = properties.find((_item) => _item.name === property.name);
+        if (filteredProperty && !!property.title) { filteredProperty.title = property.title; }
+    } else if (item) {
+        properties = { ...item, ...(item.name === property.name && !!property.title) && { title: property.title } };
+    }
+    return properties;
+}

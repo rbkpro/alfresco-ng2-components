@@ -16,7 +16,12 @@
  */
 
 import { LayoutOrientedConfigService } from './layout-oriented-config.service';
-import { LayoutOrientedConfig, Property, OrganisedPropertyGroup, PropertyGroupContainer } from '../../interfaces/content-metadata.interfaces';
+import {
+    LayoutOrientedConfig,
+    Property,
+    OrganisedPropertyGroup,
+    PropertyGroupContainer
+} from '../../interfaces/content-metadata.interfaces';
 
 describe('LayoutOrientedConfigService', () => {
 
@@ -98,11 +103,13 @@ describe('LayoutOrientedConfigService', () => {
         const property1 = <Property> { name: 'property1' },
             property2 = <Property> { name: 'property2' },
             property3 = <Property> { name: 'property3' },
-            property4 = <Property> { name: 'property4' };
+            property4 = <Property> { name: 'property4' },
+            property5 = <Property> { name: 'property5', title: 'title' };
 
         const propertyGroups: PropertyGroupContainer = {
             berseria: { title: 'Berseria', description: '', name: 'berseria', properties: { property1, property2 } },
-            zestiria: { title: 'Zestiria', description: '', name: 'zestiria', properties: { property3, property4 } }
+            zestiria: { title: 'Zestiria', description: '', name: 'zestiria', properties: { property3, property4 } },
+            supermario: { title: 'Supermario', description: '', name: 'supermario', properties: { property5 } }
         };
 
         const testCases: TestCase[] = [
@@ -227,7 +234,32 @@ describe('LayoutOrientedConfigService', () => {
                 expectations: [
                     { title: 'First group', properties: [ property3, property4, property2 ] }
                 ]
+            },
+            {
+                name: 'Custom Title',
+                config: [
+                    {
+                        title: 'First group',
+                        items: [
+                            { aspect: 'zestiria', properties: 'property3' },
+                            { type: 'berseria', properties: ['property2', <any> { title: 'Custom title', name: 'property1' }] },
+                            { type: 'supermario', properties: [<any> { title: 'Custom title', name: 'property5' }] }
+                        ]
+                    }
+                ],
+                expectations: [
+                    {
+                        title: 'First group',
+                        properties: [
+                            property3,
+                            property2,
+                            <Property> { name: 'property1', title: 'Custom title' },
+                            <Property> { name: 'property5', title: 'Custom title' }
+                        ]
+                    }
+                ]
             }
+
         ];
 
         testCases.forEach((testCase) => {
@@ -245,7 +277,7 @@ describe('LayoutOrientedConfigService', () => {
                     );
 
                     expectation.properties.forEach((property, j) => {
-                        expect(organisedPropertyGroups[i].properties[j]).toBe(property, `Property should match ${property.name}`);
+                        expect(organisedPropertyGroups[i].properties[j]).toEqual(property, `Property should match ${property.name}`);
                     });
                 });
             });

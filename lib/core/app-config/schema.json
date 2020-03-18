@@ -350,7 +350,6 @@
                     "description": "Property name",
                     "type": "string"
                   }
-
                 }
               }
             }
@@ -441,7 +440,31 @@
                       },
                       "properties": {
                         "description": "list of type properties",
-                        "type": "array"
+                        "type": "array",
+                        "items": {
+                          "oneOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "object",
+                              "required": [
+                                "title",
+                                "name"
+                              ],
+                              "properties": {
+                                "title": {
+                                  "description": "Title of aspect properties",
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "description": "Name of aspect properties",
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          ]
+                        }
                       }
                     }
                   }
